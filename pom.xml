@@ -59,12 +59,15 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok -->
+        <!-- Lombok（已禁用：JDK 26 兼容性问题，注解处理器无法加载） -->
+        <!--
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
             <optional>true</optional>
         </dependency>
+        -->
 
         <!-- 校验 -->
         <dependency>
