@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情 - 校园二手书</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .price { color: #e4393c; font-weight: 700; font-size: 24px; }
+        .price-old { color: #999; text-decoration: line-through; }
+        .cover-large { max-height: 400px; object-fit: contain; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">📚 校园二手书</a>
+        <a class="nav-link" th:href="@{/book}">← 返回商品列表</a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <div th:if="${currentUser == null}">
+                <a class="btn btn-outline-primary btn-sm me-2" th:href="@{/login}">登录</a>
+                <a class="btn btn-primary btn-sm" th:href="@{/register}">注册</a>
+            </div>
+            <div th:if="${currentUser != null}">
+                <span class="text-muted">👋 <span th:text="${currentUser.nickname}"></span></span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4" id="detailContainer" style="display:none;">
+    <div class="row">
+        <!-- 左侧封面 -->
+        <div class="col-md-5 text-center">
+            <img id="coverImage" class="cover-large img-fluid rounded border" alt="">
+        </div>
+
+        <!-- 右侧详情 -->
+        <div class="col-md-7">
+            <h3 id="title" class="mb-3"></h3>
+            <p class="text-muted small mb-3" id="subInfo"></p>
+
+            <div class="mb-3">
+                <span class="price" id="price"></span>
+                <span class="price-old ms-2" id="originalPrice" style="display:none;"></span>
+                <span class="badge bg-secondary ms-2" id="condition"></span>
+            </div>
+
+            <table class="table table-bordered table-sm small">
+                <tr><th style="width:100px;">书名</th><td id="t-title"></td></tr>
+                <tr><th>作者</th><td id="t-author"></td></tr>
+                <tr><th>出版社</th><td id="t-publisher"></td></tr>
+                <tr><th>ISBN</th><td id="t-isbn"></td></tr>
+                <tr><th>分类</th><td id="t-category"></td></tr>
+                <tr><th>卖家</th><td id="t-seller"></td></tr>
+                <tr><th>浏览次数</th><td id="t-viewCount"></td></tr>
+            </table>
+
+            <div class="mb-3">
+                <h6>商品描述</h6>
+                <p class="text-muted" id="description">—</p>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-lg" id="btnBuy" onclick="buyNow()">立即购买</button>
+                <button class="btn btn-outline-warning btn-lg" id="btnFav" onclick="toggleFav()">⭐ 收藏</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const bookId = /*[[${bookId}]]*/ 0;
+    const placeholder = 'https://via.placeholder.com/400x400?text=No+Cover';
+
+    window.onload = loadDetail;
+
+    async function loadDetail() {
+        try {
+            const resp = await fetch('/api/book/detail?id=' + bookId);
+            const json = await resp.json();
+            if (json.code !== 200) { alert(json.message); return; }
+            render(json.data);
+        } catch (e) {
+            alert('请求失败：' + e.message);
+        }
+    }
+
+    function render(b) {
+        document.getElementById('detailContainer').style.display = 'block';
+        const cover = b.coverImage || placeholder;
+        document.getElementById('coverImage').src = cover;
+        document.getElementById('title').innerText = b.title;
+        document.getElementById('subInfo').innerText =
+            (b.author || '') + ' · ' + (b.publisher || '') + ' · 发布于 ' + (b.createTime || '').slice(0,10);
+        document.getElementById('price').innerText = '¥' + b.price;
+        if (b.originalPrice != null) {
+            document.getElementById('originalPrice').innerText = '原价 ¥' + b.originalPrice;
+            document.getElementById('originalPrice').style.display = 'inline';
+        }
+        if (b.condition) {
+            const c = document.getElementById('condition');
+            c.innerText = b.condition;
+            c.style.display = 'inline';
+        }
+        document.getElementById('t-title').innerText = b.title || '—';
+        document.getElementById('t-author').innerText = b.author || '—';
+        document.getElementById('t-publisher').innerText = b.publisher || '—';
+        document.getElementById('t-isbn').innerText = b.isbn || '—';
+        document.getElementById('t-category').innerText = b.categoryName || '—';
+        document.getElementById('t-seller').innerText = b.sellerName || '—';
+        document.getElementById('t-viewCount').innerText = b.viewCount || 0;
+        document.getElementById('description').innerText = b.description || '暂无描述';
+    }
+
+    function buyNow() {
+        alert('下单功能将在第 4 步实现，请先登录后再操作～');
+    }
+
+    function toggleFav() {
+        alert('收藏功能将在第 5 步实现，请先登录后再操作～');
+    }
+</script>
+</body>
+</html>

@@ -19,6 +19,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" th:href="@{/}">📚 校园二手书</a>
+            <a class="nav-link me-4" th:href="@{/book}">商品浏览</a>
             <div class="collapse navbar-collapse justify-content-end">
                 <!-- 未登录：显示登录/注册按钮 -->
                 <div th:if="${currentUser == null}">

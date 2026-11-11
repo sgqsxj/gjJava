@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品列表 - 校园二手书</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .navbar-brand { font-weight: 700; }
+        .book-card { transition: transform .2s, box-shadow .2s; cursor: pointer; }
+        .book-card:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .book-cover { width: 100%; height: 200px; object-fit: cover; background: #f5f5f5; }
+        .price { color: #e4393c; font-weight: 700; font-size: 18px; }
+        .price-old { color: #999; text-decoration: line-through; font-size: 13px; }
+        .filter-bar { background: #f8f9fa; padding: 16px 0; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">📚 校园二手书</a>
+        <a class="nav-link active" th:href="@{/book}">商品</a>
+        <div class="ms-auto d-flex align-items-center">
+            <div th:if="${currentUser == null}">
+                <a class="btn btn-outline-primary btn-sm me-2" th:href="@{/login}">登录</a>
+                <a class="btn btn-primary btn-sm" th:href="@{/register}">注册</a>
+            </div>
+            <div th:if="${currentUser != null}" class="d-flex align-items-center gap-2">
+                <a class="btn btn-success btn-sm" th:href="@{/book/publish}">+ 发布商品</a>
+                <span class="text-muted">👋 <span th:text="${currentUser.nickname}"></span></span>
+                <form action="/api/user/logout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">退出</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- 搜索 + 筛选栏 -->
+    <div class="filter-bar rounded">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small text-muted">关键字</label>
+                <input type="text" id="keyword" class="form-control" placeholder="搜索书名或作者">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-muted">分类</label>
+                <select id="categoryId" class="form-select">
+                    <option value="">全部分类</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button onclick="loadBooks(1)" class="btn btn-primary w-100">🔍 搜索</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品卡片网格 -->
+    <div id="bookList" class="row g-3"></div>
+
+    <!-- 分页导航 -->
+    <nav id="pagination" class="mt-4" style="display:none;">
+        <ul class="pagination justify-content-center" id="pageNav"></ul>
+    </nav>
+
+    <!-- 空状态 -->
+    <div id="emptyTip" class="text-center text-muted py-5" style="display:none;">
+        <h4>😢 没有找到相关商品</h4>
+        <p>换个关键字试试？</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentPage = 1;
+    const pageSize = 6;
+
+    // 页面加载时自动搜一次
+    window.onload = () => loadBooks(1);
+
+    async function loadBooks(pageNum) {
+        currentPage = pageNum;
+        const keyword   = document.getElementById('keyword').value.trim();
+        const categoryId = document.getElementById('categoryId').value;
+        const params = new URLSearchParams({ pageNum, pageSize });
+        if (keyword)    params.append('keyword', keyword);
+        if (categoryId) params.append('categoryId', categoryId);
+
+        try {
+            const resp = await fetch('/api/book/list?' + params.toString());
+            const json = await resp.json();
+            if (json.code !== 200) { alert(json.message); return; }
+            renderBooks(json.data);
+            renderPagination(json.data);
+        } catch (e) {
+            alert('请求失败：' + e.message);
+        }
+    }
+
+    function renderBooks(page) {
+        const list = page.list || [];
+        const container = document.getElementById('bookList');
+        const emptyTip  = document.getElementById('emptyTip');
+        container.innerHTML = '';
+
+        if (list.length === 0) {
+            emptyTip.style.display = 'block';
+            document.getElementById('pagination').style.display = 'none';
+            return;
+        }
+        emptyTip.style.display = 'none';
+
+        const placeholder = 'https://via.placeholder.com/300x200?text=No+Cover';
+        list.forEach(book => {
+            const cover = book.coverImage || placeholder;
+            const card = `
+                <div class="col-md-4 col-lg-3">
+                    <div class="card book-card h-100" onclick="location.href='/book/detail/${book.id}'">
+                        <img src="${cover}" class="book-cover card-img-top" alt="">
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate" title="${book.title}">${book.title}</h6>
+                            <p class="small text-muted mb-1">${book.author || ''} · ${book.categoryName || ''}</p>
+                            <div>
+                                <span class="price">¥${book.price}</span>
+                                <span class="price-old ms-1" th:if="${book.originalPrice != null}">¥${book.originalPrice}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-1">
+                                <span>${book.condition || ''}</span>
+                                <span>👁 ${book.viewCount || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += card;
+        });
+    }
+
+    function renderPagination(page) {
+        const total = page.total || 0;
+        const pages = page.pages || 1;
+        const navEl = document.getElementById('pagination');
+        const ul    = document.getElementById('pageNav');
+        navEl.style.display = pages > 1 ? 'block' : 'none';
+        ul.innerHTML = '';
+
+        for (let i = 1; i <= pages; i++) {
+            const li = document.createElement('li');
+            li.className = 'page-item' + (i === currentPage ? ' active' : '');
+            li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="loadBooks(${i})">${i}</a>`;
+            ul.appendChild(li);
+        }
+    }
+</script>
+</body>
+</html>

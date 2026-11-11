@@ -18,9 +18,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         // 需要登录才能访问的 API
                         "/api/order/**",
                         "/api/favorite/**",
+                        "/api/book/publish",
+                        "/api/book/**/status",
                         "/api/user/me/**",
                         "/api/user/update-password",
-                        // 需要登录才能访问的页面（后续步骤会用到）
+                        // 需要登录才能访问的页面
                         "/center/**",
                         "/order/**",
                         "/favorite/**",
