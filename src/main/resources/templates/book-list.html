@@ -28,6 +28,7 @@
             </div>
             <div th:if="${currentUser != null}" class="d-flex align-items-center gap-2">
                 <a class="btn btn-success btn-sm" th:href="@{/book/publish}">+ 发布商品</a>
+                <a class="btn btn-outline-primary btn-sm" th:href="@{/order}">我的订单</a>
                 <span class="text-muted">👋 <span th:text="${currentUser.nickname}"></span></span>
                 <form action="/api/user/logout" method="post" class="d-inline">
                     <button type="submit" class="btn btn-outline-secondary btn-sm">退出</button>

@@ -28,6 +28,7 @@
                 </div>
                 <!-- 已登录：显示昵称和退出 -->
                 <div th:if="${currentUser != null}" class="d-flex align-items-center">
+                    <a class="btn btn-outline-primary btn-sm me-2" th:href="@{/order}">我的订单</a>
                     <span class="text-muted me-3">👋 <span th:text="${currentUser.nickname}">用户</span></span>
                     <form action="/api/user/logout" method="post" class="d-inline">
                         <button type="submit" class="btn btn-outline-secondary btn-sm">退出</button>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusbook.repository.OrderMapper">
+
+    <resultMap id="OrderBaseMap" type="com.campusbook.entity.Order">
+        <id     column="id"           property="id"/>
+        <result column="order_no"     property="orderNo"/>
+        <result column="buyer_id"     property="buyerId"/>
+        <result column="seller_id"    property="sellerId"/>
+        <result column="book_id"      property="bookId"/>
+        <result column="book_title"   property="bookTitle"/>
+        <result column="book_price"   property="bookPrice"/>
+        <result column="quantity"     property="quantity"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="address"      property="address"/>
+        <result column="status"       property="status"/>
+        <result column="pay_time"     property="payTime"/>
+        <result column="ship_time"    property="shipTime"/>
+        <result column="finish_time"  property="finishTime"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="update_time"  property="updateTime"/>
+    </resultMap>
+
+    <!-- 关联查询结果映射：含买家 / 卖家昵称 -->
+    <resultMap id="OrderDetailMap" type="com.campusbook.entity.Order" extends="OrderBaseMap">
+        <result column="buyer_name"  property="buyerName"/>
+        <result column="seller_name" property="sellerName"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, order_no, buyer_id, seller_id, book_id, book_title, book_price,
+        quantity, total_amount, address, status, pay_time, ship_time, finish_time,
+        create_time, update_time
+    </sql>
+
+    <!-- ============== 新增订单 ============== -->
+    <insert id="insert" parameterType="com.campusbook.entity.Order"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders
+        (order_no, buyer_id, seller_id, book_id, book_title, book_price,
+         quantity, total_amount, address, status)
+        VALUES
+        (#{orderNo}, #{buyerId}, #{sellerId}, #{bookId}, #{bookTitle}, #{bookPrice},
+         #{quantity}, #{totalAmount}, #{address}, #{status})
+    </insert>
+
+    <!-- ============== 按 ID 查询 ============== -->
+    <select id="selectById" resultMap="OrderBaseMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM orders WHERE id = #{id}
+    </select>
+
+    <!-- ============== 按 ID 查询（关联买家 / 卖家昵称） ============== -->
+    <select id="selectByIdWithUsers" resultMap="OrderDetailMap">
+        SELECT
+            o.id, o.order_no, o.buyer_id, o.seller_id, o.book_id, o.book_title, o.book_price,
+            o.quantity, o.total_amount, o.address, o.status,
+            o.pay_time, o.ship_time, o.finish_time, o.create_time, o.update_time,
+            b.nickname AS buyer_name,
+            s.nickname AS seller_name
+        FROM orders o
+        LEFT JOIN user b ON o.buyer_id  = b.id
+        LEFT JOIN user s ON o.seller_id = s.id
+        WHERE o.id = #{id}
+    </select>
+
+    <!-- ============== 多条件动态分页查询 ============== -->
+    <select id="selectWithCondition" parameterType="com.campusbook.dto.OrderQuery"
+            resultMap="OrderDetailMap">
+        SELECT
+            o.id, o.order_no, o.buyer_id, o.seller_id, o.book_id, o.book_title, o.book_price,
+            o.quantity, o.total_amount, o.address, o.status,
+            o.pay_time, o.ship_time, o.finish_time, o.create_time, o.update_time,
+            b.nickname AS buyer_name,
+            s.nickname AS seller_name
+        FROM orders o
+        LEFT JOIN user b ON o.buyer_id  = b.id
+        LEFT JOIN user s ON o.seller_id = s.id
+        <where>
+            <if test="buyerId != null">
+                AND o.buyer_id = #{buyerId}
+            </if>
+            <if test="sellerId != null">
+                AND o.seller_id = #{sellerId}
+            </if>
+            <if test="status != null and status != ''">
+                AND o.status = #{status}
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+    </select>
+
+    <!-- ============== 状态流转（CAS：WHERE status = 期望状态） ============== -->
+    <update id="updateStatusIfMatch">
+        UPDATE orders
+        <set>
+            status = #{targetStatus},
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="shipTime != null">ship_time = #{shipTime},</if>
+            <if test="finishTime != null">finish_time = #{finishTime},</if>
+        </set>
+        WHERE id = #{id} AND status = #{expectStatus}
+    </update>
+
+</mapper>

@@ -135,4 +135,16 @@
         UPDATE book SET status = #{status} WHERE id = #{id}
     </update>
 
+    <!-- ============== 扣减库存（乐观锁防超卖） ============== -->
+    <!-- stock >= quantity 是 CAS 判断条件：并发下单时只有一个线程能扣减成功 -->
+    <update id="decreaseStock">
+        UPDATE book SET stock = stock - #{quantity}
+        WHERE id = #{id} AND stock &gt;= #{quantity}
+    </update>
+
+    <!-- ============== 回补库存（取消订单） ============== -->
+    <update id="increaseStock">
+        UPDATE book SET stock = stock + #{quantity} WHERE id = #{id}
+    </update>
+
 </mapper>

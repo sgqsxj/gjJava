@@ -48,4 +48,16 @@ public interface BookMapper {
      * 按 ID 上架 / 下架
      */
     int updateStatus(@Param("id") Long id, @Param("status") Integer status);
+
+    /**
+     * 扣减库存（乐观锁防超卖）
+     * SQL: UPDATE book SET stock = stock - #{quantity} WHERE id = #{id} AND stock >= #{quantity}
+     * 返回 0 表示库存不足（并发下单时被其他线程抢先扣减）
+     */
+    int decreaseStock(@Param("id") Long id, @Param("quantity") Integer quantity);
+
+    /**
+     * 回补库存（订单取消时调用）
+     */
+    int increaseStock(@Param("id") Long id, @Param("quantity") Integer quantity);
 }

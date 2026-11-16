@@ -71,6 +71,16 @@ public class PageController {
     }
 
     /**
+     * 我的订单页（需登录，WebMvcConfig 已拦截 /order/**）
+     * GET /order?role=buy|sell
+     */
+    @GetMapping("/order")
+    public String orderListPage(HttpSession session, Model model) {
+        injectCommon(session, model);
+        return "order-list";
+    }
+
+    /**
      * 每个页面都需要：当前登录用户 + 全部分类（用于顶栏分类筛选）
      */
     private void injectCommon(HttpSession session, Model model) {
