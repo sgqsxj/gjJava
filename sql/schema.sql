@@ -1,5 +1,5 @@
 -- ============================================================
--- 校园二手书交易管理系统 建表脚本
+-- 校园二手交易管理系统 建表脚本
 -- 数据库: campus_book
 -- 字符集: utf8mb4
 -- ============================================================
@@ -26,7 +26,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 -- ------------------------------------------------------------
--- 2. 图书分类表
+-- 2. 商品分类表
 -- ------------------------------------------------------------
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
@@ -35,19 +35,19 @@ CREATE TABLE `category` (
     `sort`        INT         NOT NULL DEFAULT 0 COMMENT '排序',
     `create_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图书分类表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品分类表';
 
 -- ------------------------------------------------------------
--- 3. 商品表（二手书）
+-- 3. 商品表（校园二手物品）
 -- stock 字段为后续并发控制（乐观锁防超卖）预留考核点
 -- ------------------------------------------------------------
 DROP TABLE IF EXISTS `book`;
 CREATE TABLE `book` (
     `id`            BIGINT        NOT NULL AUTO_INCREMENT COMMENT '商品ID',
-    `title`         VARCHAR(100)  NOT NULL COMMENT '书名',
-    `author`        VARCHAR(100)  DEFAULT NULL COMMENT '作者',
-    `publisher`     VARCHAR(100)  DEFAULT NULL COMMENT '出版社',
-    `isbn`          VARCHAR(20)   DEFAULT NULL COMMENT 'ISBN',
+    `title`         VARCHAR(100)  NOT NULL COMMENT '物品名称',
+    `author`        VARCHAR(100)  DEFAULT NULL COMMENT '品牌/型号',
+    `publisher`     VARCHAR(100)  DEFAULT NULL COMMENT '规格/尺寸',
+    `isbn`          VARCHAR(20)   DEFAULT NULL COMMENT '商品编号（可选）',
     `category_id`   BIGINT        DEFAULT NULL COMMENT '分类ID',
     `seller_id`     BIGINT        NOT NULL COMMENT '卖家用户ID',
     `original_price` DECIMAL(10,2) DEFAULT NULL COMMENT '原价',
@@ -64,7 +64,7 @@ CREATE TABLE `book` (
     KEY `idx_category` (`category_id`),
     KEY `idx_seller` (`seller_id`),
     KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表（二手书）';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表（校园二手物品）';
 
 -- ------------------------------------------------------------
 -- 4. 订单表
@@ -76,7 +76,7 @@ CREATE TABLE `orders` (
     `buyer_id`     BIGINT        NOT NULL COMMENT '买家用户ID',
     `seller_id`    BIGINT        NOT NULL COMMENT '卖家用户ID',
     `book_id`      BIGINT        NOT NULL COMMENT '商品ID',
-    `book_title`   VARCHAR(100)  NOT NULL COMMENT '商品快照-书名',
+    `book_title`   VARCHAR(100)  NOT NULL COMMENT '商品快照-物品名称',
     `book_price`   DECIMAL(10,2) NOT NULL COMMENT '商品快照-单价',
     `quantity`     INT           NOT NULL DEFAULT 1 COMMENT '购买数量',
     `total_amount` DECIMAL(10,2) NOT NULL COMMENT '订单总金额',
@@ -112,13 +112,13 @@ CREATE TABLE `favorite` (
 -- 初始分类数据
 -- ------------------------------------------------------------
 INSERT INTO `category` (`name`, `sort`) VALUES
-('教材教辅', 1),
-('计算机', 2),
-('文学小说', 3),
-('历史人文', 4),
-('经管励志', 5),
-('外语学习', 6),
-('艺术设计', 7),
+('图书教材', 1),
+('电子产品', 2),
+('生活用品', 3),
+('运动器材', 4),
+('服饰鞋包', 5),
+('美妆个护', 6),
+('乐器文具', 7),
 ('其他', 99);
 
 -- ------------------------------------------------------------

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 图书分类实体
+ * 商品分类实体
  */
 public class Category implements Serializable {
 

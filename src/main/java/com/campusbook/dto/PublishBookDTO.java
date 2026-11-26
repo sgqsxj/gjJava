@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public class PublishBookDTO {
 
-    @NotBlank(message = "书名不能为空")
+    @NotBlank(message = "物品名称不能为空")
     private String title;
 
     private String author;

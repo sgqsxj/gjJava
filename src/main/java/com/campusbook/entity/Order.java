@@ -17,7 +17,7 @@ public class Order implements Serializable {
     private Long buyerId;
     private Long sellerId;
     private Long bookId;
-    /** 商品快照-书名 */
+    /** 商品快照-物品名称 */
     private String bookTitle;
     /** 商品快照-单价 */
     private BigDecimal bookPrice;

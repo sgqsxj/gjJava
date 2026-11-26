@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * 1. 订单状态机（OrderStatus 枚举 + canTransitionTo 校验）
  * 2. 乐观锁防超卖（book.stock >= quantity 的 CAS 扣减）
  * 3. 订单状态 CAS 更新（WHERE status = 期望状态），防止并发重复流转
- * 4. 订单商品快照（书名 / 单价入订单，后续商品改价不影响历史订单）
+ * 4. 订单商品快照（物品名称 / 单价入订单，后续商品改价不影响历史订单）
  */
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         order.setBuyerId(buyerId);
         order.setSellerId(book.getSellerId());
         order.setBookId(book.getId());
-        // 商品快照：下单时的书名与单价
+        // 商品快照：下单时的物品名称与单价
         order.setBookTitle(book.getTitle());
         order.setBookPrice(book.getPrice());
         order.setQuantity(quantity);

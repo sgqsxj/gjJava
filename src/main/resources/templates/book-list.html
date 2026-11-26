@@ -2,7 +2,7 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>商品列表 - 校园二手书</title>
+    <title>商品列表 - 校园二手</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         .navbar-brand { font-weight: 700; }
@@ -19,7 +19,7 @@
 <!-- 顶部导航 -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/}">📚 校园二手书</a>
+        <a class="navbar-brand" th:href="@{/}">🛒 校园二手</a>
         <a class="nav-link active" th:href="@{/book}">商品</a>
         <div class="ms-auto d-flex align-items-center">
             <div th:if="${currentUser == null}">
@@ -45,7 +45,7 @@
         <div class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label class="form-label small text-muted">关键字</label>
-                <input type="text" id="keyword" class="form-control" placeholder="搜索书名或作者">
+                <input type="text" id="keyword" class="form-control" placeholder="搜索物品名称或品牌">
             </div>
             <div class="col-md-4">
                 <label class="form-label small text-muted">分类</label>

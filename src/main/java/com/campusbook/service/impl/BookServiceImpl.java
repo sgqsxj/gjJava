@@ -36,7 +36,7 @@ public class BookServiceImpl implements BookService {
         book.setCondition(dto.getCondition());
         book.setDescription(dto.getDescription());
         book.setCoverImage(dto.getCoverImage());
-        book.setStock(1);        // 二手书默认库存 1（乐观锁预留）
+        book.setStock(1);        // 二手物品默认库存 1（乐观锁预留）
         book.setStatus(1);        // 默认上架
         book.setViewCount(0);
         book.setSellerId(sellerId);

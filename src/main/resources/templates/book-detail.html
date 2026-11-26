@@ -2,7 +2,7 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>商品详情 - 校园二手书</title>
+    <title>商品详情 - 校园二手</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         .price { color: #e4393c; font-weight: 700; font-size: 24px; }
@@ -15,7 +15,7 @@
 <!-- 顶部导航 -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/}">📚 校园二手书</a>
+        <a class="navbar-brand" th:href="@{/}">🛒 校园二手</a>
         <a class="nav-link" th:href="@{/book}">← 返回商品列表</a>
         <div class="ms-auto d-flex align-items-center gap-2">
             <div th:if="${currentUser == null}">
@@ -48,10 +48,9 @@
             </div>
 
             <table class="table table-bordered table-sm small">
-                <tr><th style="width:100px;">书名</th><td id="t-title"></td></tr>
-                <tr><th>作者</th><td id="t-author"></td></tr>
-                <tr><th>出版社</th><td id="t-publisher"></td></tr>
-                <tr><th>ISBN</th><td id="t-isbn"></td></tr>
+                <tr><th style="width:100px;">物品名称</th><td id="t-title"></td></tr>
+                <tr><th>品牌 / 型号</th><td id="t-author"></td></tr>
+                <tr><th>规格 / 尺寸</th><td id="t-publisher"></td></tr>
                 <tr><th>分类</th><td id="t-category"></td></tr>
                 <tr><th>卖家</th><td id="t-seller"></td></tr>
                 <tr><th>浏览次数</th><td id="t-viewCount"></td></tr>
@@ -109,7 +108,6 @@
         document.getElementById('t-title').innerText = b.title || '—';
         document.getElementById('t-author').innerText = b.author || '—';
         document.getElementById('t-publisher').innerText = b.publisher || '—';
-        document.getElementById('t-isbn').innerText = b.isbn || '—';
         document.getElementById('t-category').innerText = b.categoryName || '—';
         document.getElementById('t-seller').innerText = b.sellerName || '—';
         document.getElementById('t-viewCount').innerText = b.viewCount || 0;
@@ -121,7 +119,7 @@
             location.href = '/login?redirect=/book/detail/' + bookId;
             return;
         }
-        if (!confirm('确认下单购买这本《' + document.getElementById('title').innerText + '》？')) return;
+        if (!confirm('确认下单购买【' + document.getElementById('title').innerText + '】？')) return;
         try {
             const resp = await fetch('/api/order/create', {
                 method: 'POST',

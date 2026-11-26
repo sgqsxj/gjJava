@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 商品（二手书）实体
+ * 商品（校园二手物品）实体
  * 对应数据库 book 表
  * sellerName 非表字段，LEFT JOIN user 查询回填
  */
